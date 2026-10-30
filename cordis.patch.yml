@@ -1,0 +1,5 @@
+# dsh_i_memory_format bundle patch: the format-only memory service.
+# Register this package through a profile's dsh.profile.bundles.
+- insert:
+    - id: i-memory
+      name: 'dsh_i_memory_format'
