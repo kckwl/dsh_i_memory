@@ -6,6 +6,14 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kckwl/dsh_i_memory.git"
+  },
+  "homepage": "https://github.com/kckwl/dsh_i_memory#readme",
+  "bugs": {
+    "url": "https://github.com/kckwl/dsh_i_memory/issues"
+  },
   "keywords": [
     "dsh",
     "cordis",
