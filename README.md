@@ -1,8 +1,8 @@
 # dsh_i_memory_format
 
-给 DeepSeek Harness 用的记忆插件。它只干一件事：**把记忆存住，并在你需要的时候，把最相关的那几条捞出来，变成一句人话。**
+DeepSeek Harness 记忆插件。**把记忆存住，并在你需要的时候，把最相关的那几条捞出来，变成一句人话。**
 
-为什么单独做一层？因为上下文窗口装不下所有经历。窗口可以清空，但经历不该跟着消失。所以它把「进行时」留给宿主，自己负责「记忆」和「读取」。
+上下文窗口装不下所有经历。窗口可以清空，但经历不该跟着消失。所以它把「进行时」留给宿主，自己负责「记忆」和「读取」。
 
 ![node](https://img.shields.io/badge/node-%E2%89%A522-3c873a)
 ![version](https://img.shields.io/badge/version-0.1.0-lightgrey)
@@ -10,7 +10,7 @@
 
 ---
 
-## 它能做什么
+## 实现方式
 
 - **存**：经历、事实、坑、偏好、未结项、自述，六种形态，各有各的字段。
 - **连**：记录之间留一条出边，像神经元那样，一个接一个走。
@@ -20,8 +20,6 @@
 存下来就改不了。状态变了、用过了、被人批注了、桥换了方向，都是往文件末尾追加一条新事件。整条流随时可以重放，也可以直接 `grep`。
 
 ## 安装
-
-需要 Node 22 以上。
 
 ```bash
 npm install dsh_i_memory_format
@@ -33,7 +31,7 @@ npm install dsh_i_memory_format
 npm install /path/to/dsh_i_memory
 ```
 
-它是一个 Cordis 插件，注册后就能拿到 `iMemory` 服务：
+一个 Cordis 插件
 
 ```ts
 import { Context } from '@deepseek-ai/cordis';
@@ -47,7 +45,7 @@ const memory = ctx.get('iMemory');
 
 也可以把包加进 profile 的 `dsh.profile.bundles`，或者放进该 profile 的插件目录。
 
-## 先跑通一次
+## 相关例子（目前不具备普遍性）
 
 ```ts
 import { MemoryService } from 'dsh_i_memory_format';
@@ -98,13 +96,13 @@ const result = await memory.remember({
 console.log(memory.render(memory.store.get('m_whale')!, { now: '2026-10-04T12:00:00.000Z' }));
 ```
 
-跑出来是这样：
+输出：
 
 ```
 9月中旬，调试挂件时，改渲染，页面正常。
 ```
 
-## 平时会用到的东西
+## 工具（可能用到）
 
 **记一条**
 
@@ -153,7 +151,7 @@ memory.confidence('m_whale', now); // { real, procedural, value, settled }
 memory.settle('m_whale', now);     // { before, after, refunded }
 ```
 
-## 它是怎么分的
+## 大致流程
 
 ```
 A 记录层  →  B 连接层  →  C 检索层  →  D 循环层
@@ -170,7 +168,7 @@ A 记录层  →  B 连接层  →  C 检索层  →  D 循环层
 
 想知道每块要做到什么程度，看 `src/` 里的代码就行；源码和编译产物都在包里。
 
-## 参数
+## 相关参数
 
 都能在构造时改，也都能走 Cordis 配置。
 
@@ -187,19 +185,19 @@ A 记录层  →  B 连接层  →  C 检索层  →  D 循环层
 | `confStop` | 0.85 | 置信到这儿就不再往深里读 |
 | `trashPerDay` | 10 | AI 一天最多扔几条 |
 
-默认值是为了先跑起来。真实效果取决于你怎么用，按自己的数据调就好。
+默认值是为了先跑起来。真实效果取决于你需要怎么用，按自己的数据调就好，支持个性化。
 
-如果连曲线本身都想换，`ProgressModel` 的五个函数（时间、反向换算、单步贡献、创新、百分比）都可以替换：
+如果连曲线本身都想换，`ProgressModel` 的五个函数（时间、反向换算、单步贡献、创新、百分比）也都可以替换：
 
 ```ts
 new MemoryService({ progress: myModel });
 ```
 
-## 它的边界
+## 它边界
 
-它只做格式层：不碰界面、不监听会话、不注册工具、不做多模型编排。试答、向量、外查都是你注入的端口。
+格式层：不碰界面、不监听会话、不注册工具、不做多模型编排。试答、向量、外查都是所注入的端口。
 
-存储就是普通 `.jsonl`，没有自定义扩展名。密钥在写入前替换掉，化名映射表单独放，只有人能反查。
+存储是普通 `.jsonl`，未自定义扩展名。一般而言，密钥在写入前替换掉（如果需要外传建议自己审核一遍），化名映射表单独放，只有人能反查。
 
 ## 开发
 
@@ -210,9 +208,14 @@ npm run typecheck  # 只检查类型
 
 源码在 `src/`，编译产物在 `lib/`，两边都随包发布。
 
-## 兼容
+## 兼容（具体未测试）
 
-Node ≥ 22，ESM。Cordis 4.x。
+Node ≥ 22，ESM   
+Cordis 4.x   
+
+## 注意事项
+
+目前仅仅是一个小的部分，且未进行大量测试及实验，可能存在大量bug，不过这个主要做的是存和读取记忆的事，应该不会导致非人为的崩溃泄密等情况。目前还会持续更新，仍有部分想法未实现。
 
 ## License
 
